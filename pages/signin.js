@@ -40,8 +40,7 @@ class Signin extends React.Component {
       .catch(this.showError);
   };
 
-  showError = err => {
-    const error = (err.response && err.response.data) || err.message;
+  showError = error => {
     this.setState({ error, openError: true, isLoading: false });
   };
 
