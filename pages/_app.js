@@ -4,6 +4,8 @@ import Head from "next/head";
 import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import JssProvider from "react-jss/lib/JssProvider";
+import withNProgress from "next-nprogress";
+import NProgress from "next-nprogress/component";
 
 import Navbar from "../components/Navbar";
 import getPageContext from "../lib/getPageContext";
@@ -49,9 +51,16 @@ class MyApp extends App {
             <Component pageContext={this.pageContext} {...pageProps} />
           </MuiThemeProvider>
         </JssProvider>
+        <NProgress
+          color="#29d"
+          options={{ trickleSpeed: 50 }}
+          showAfterMs={300}
+          spinner
+        />
       </Container>
     );
   }
 }
+const msDelay = 200;
 
-export default MyApp;
+export default withNProgress(msDelay)(MyApp);
