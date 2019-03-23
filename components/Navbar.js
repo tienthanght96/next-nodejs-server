@@ -29,7 +29,7 @@ const Navbar = ({ classes, router, pageProps: { auth } }) => {
           ? (
               <div>
                 <Button>
-                  <ActiveLink href="/profile">Profile</ActiveLink>
+                  <ActiveLink href={`/profile/${user._id}`}>Profile</ActiveLink>
                 </Button>
                 <Button variant="outlined" onClick={signoutUser} >Sign out</Button>
               </div>
