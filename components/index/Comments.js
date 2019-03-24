@@ -52,7 +52,8 @@ class Comments extends React.Component {
 
   render() {
     const { auth, comments, classes } = this.props;
-    const { } = this.state;
+    const { text } = this.state;
+    
     return (
       <div className={classes.comments}>
         <CardHeader

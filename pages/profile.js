@@ -14,7 +14,10 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Link from "next/link";
 
 import { authInitialProps } from "../lib/auth";
-import { getUser } from "../lib/api";
+import {
+  getUser, getPostsByUser, deletePost,
+  likePost, unlikePost, addComment, deleteComment
+} from "../lib/api";
 import FollowUser from "../components/profile/FollowUser";
 import DeleteUser from "../components/profile/DeleteUser";
 import ProfileTabs from "../components/profile/ProfileTabs";
@@ -35,7 +38,8 @@ class Profile extends React.Component {
     const isAuth = auth.user._id === userId;
     try {
       const user = await getUser(userId);
-      this.setState({ user, isLoading: false, isAuth });
+      const posts = await getPostsByUser(userId);
+      this.setState({ user, isLoading: false, isAuth, posts });
     } catch (error) {
       console.log(error.response.message);
     }
@@ -47,17 +51,84 @@ class Profile extends React.Component {
     );
   };
 
-  toggleFollow = sendRequest => {
-    
+  toggleFollow = async sendRequest => {
+    const { userId } = this.props;
+    const { isFollowing } = this.state;
+    try {
+      await sendRequest(userId);
+      this.setState({ isFollowing: !isFollowing });
+    } catch (error) {
+      
+    }
   };
 
-  handleDeletePost = () => {}
+  handleDeletePost = async deletedPost => {
+    this.setState({ isDeletingPost: true });
+    try {
+      const postData = await deletePost(deletedPost._id);
+      const postIndex = this.state.posts.findIndex(post => post._id === postData._id);
+      const updatedPosts = [
+        ...this.state.posts.slice(0, postIndex),
+        ...this.state.posts.slice(postIndex + 1)
+      ];
+      this.setState({
+        posts: updatedPosts,
+        isDeletingPost: false
+      });
+    } catch (error) {
+      console.error(err);
+      this.setState({ isDeletingPost: false });
+    }
+  }
 
-  handleToggleLike = () => {}
+  handleToggleLike = async post => {
+    const { auth } = this.props;
+    const isPostLiked = post.likes.includes(auth.user._id);
+    const sendRequest = isPostLiked ? unlikePost : likePost;
+    try {
+      const postData = await sendRequest(post._id);
+      const postIndex = this.state.posts.findIndex(post => post._id === postData._id);
+      const updatedPosts = [
+        ...this.state.posts.slice(0, postIndex),
+        postData,
+        ...this.state.posts.slice(postIndex + 1)
+      ];
+      this.setState({ posts: updatedPosts });
+    } catch (error) {
+      
+    }
+  }
   
-  handleAddComment = () => {}
+  handleAddComment = async (postId, text) => {
+    const comment = { text };
+    try {
+      const postData = await addComment(postId, comment);
+      const postIndex = this.state.posts.findIndex(post => post._id === postData._id);
+      const updatedPosts = [
+        ...this.state.posts.slice(0, postIndex),
+        postData,
+        ...this.state.posts.slice(postIndex + 1)
+      ];
+      this.setState({ posts: updatedPosts });
+    } catch (error) {
+      
+    }
+  }
 
-  handleDeleteComment = () => {}
+  handleDeleteComment = async (postId, comment) => {
+    try {
+      const postData = await deleteComment(postId, comment);
+      const postIndex = this.state.posts.findIndex(post => post._id === postData._id);
+      const updatedPosts = [
+        ...this.state.posts.slice(0, postIndex),
+        postData,
+        ...this.state.posts.slice(postIndex + 1)
+      ];
+      this.setState({ posts: updatedPosts });
+    } catch (error) {
+      
+    }
+  }
 
   render() {
     const { classes, auth } = this.props;

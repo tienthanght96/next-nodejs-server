@@ -61,7 +61,6 @@ class Post extends React.PureComponent {
     } = this.props;
     const { isLiked, numLikes, comments } = this.state;
     const isPostCreator = post.postedBy._id === auth.user._id;
-
     return (
       <Card className={classes.card}>
         {/* Post Header */}
